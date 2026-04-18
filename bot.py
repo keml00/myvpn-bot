@@ -3,6 +3,7 @@ import logging
 import sys
 import os
 from urllib.parse import quote
+from datetime import datetime
 
 # Добавляем текущую директорию в путь
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -37,6 +38,27 @@ class UserStates(StatesGroup):
     waiting_tariff = State()
     waiting_payment = State()
 
+# ============= ЛОГИРОВАНИЕ ДЕЙСТВИЙ =============
+
+async def log_user_action(user, action: str):
+    """Логирование действий пользователя и уведомление админа"""
+    username = f"@{user.username}" if user.username else "нет username"
+    user_name = user.first_name or "Unknown"
+
+    log_text = (
+        f"👤 Активность пользователя\n\n"
+        f"Имя: {user_name}\n"
+        f"Username: {username}\n"
+        f"ID: {user.id}\n"
+        f"Действие: {action}\n"
+        f"Время: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+    )
+
+    try:
+        await bot.send_message(ADMIN_ID, log_text)
+    except Exception as e:
+        logger.error(f"Ошибка отправки лога админу: {e}")
+
 # ============= ПОЛЬЗОВАТЕЛЬСКИЕ ХЕНДЛЕРЫ =============
 
 @router.message(Command("start"))
@@ -44,6 +66,9 @@ async def cmd_start(message: Message):
     """Команда /start"""
     await db.add_user(message.from_user.id, message.from_user.username, message.from_user.first_name)
     await db.update_last_active(message.from_user.id)
+
+    # Логируем действие
+    await log_user_action(message.from_user, "Запустил бота /start")
 
     # Проверяем активную подписку
     subscription = await db.get_user_subscription(message.from_user.id)
@@ -88,6 +113,9 @@ async def process_tariff_button(callback: CallbackQuery):
         return
 
     tariff = TARIFFS[tariff_key]
+
+    # Логируем действие
+    await log_user_action(callback.from_user, f"Выбрал тариф: {tariff['name']} ({tariff['price']}₽)")
 
     # Формируем текст для автоматической вставки
     message_text = f"Привет! Хочу арендовать VPN сервер\n\nТариф: {tariff['name']}\nЦена: {tariff['price']}₽"
@@ -158,6 +186,9 @@ async def process_payment_no_photo(message: Message):
 @router.message(Command("status"))
 async def cmd_status(message: Message):
     """Проверка статуса подписки"""
+    # Логируем действие
+    await log_user_action(message.from_user, "Проверил статус подписки /status")
+
     subscription = await db.get_user_subscription(message.from_user.id)
 
     if not subscription:
