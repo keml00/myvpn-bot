@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -c \"import asyncio; from database import Database; db = Database\\(\\); asyncio.run\\(db.init_db\\(\\)\\); print\\('Database OK'\\)\")",
+      "Bash(pip install *)",
+      "Bash(python test_bot.py)",
+      "Bash(python -m py_compile bot.py)"
+    ]
+  }
+}

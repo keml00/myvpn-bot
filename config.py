@@ -20,28 +20,28 @@ SERVER_PORT = os.getenv("SERVER_PORT", "443")
 TARIFFS = {
     "1": {
         "name": "1 месяц",
-        "price": 200,
+        "price": 100,
         "traffic_gb": 100,
         "emoji": "1️⃣",
         "badge": ""
     },
     "2": {
         "name": "3 месяца",
-        "price": 550,
+        "price": 275,
         "traffic_gb": 300,
         "emoji": "2️⃣",
         "badge": "🔥 ПОПУЛЯРНЫЙ"
     },
     "3": {
         "name": "6 месяцев",
-        "price": 1000,
+        "price": 500,
         "traffic_gb": 600,
         "emoji": "3️⃣",
         "badge": "💎 ВЫГОДНО"
     },
     "4": {
         "name": "12 месяцев",
-        "price": 1800,
+        "price": 900,
         "traffic_gb": 1200,
         "emoji": "4️⃣",
         "badge": "⭐ ЛУЧШИЙ ВЫБОР"
@@ -71,24 +71,23 @@ def get_tariffs_text():
     for key, tariff in TARIFFS.items():
         savings = ""
         if key == "2":
-            savings = "\n   Экономия 50₽"
+            savings = "\n   Экономия 25₽"
         elif key == "3":
-            savings = "\n   Экономия 200₽"
+            savings = "\n   Экономия 100₽"
         elif key == "4":
-            savings = "\n   Экономия 600₽"
+            savings = "\n   Экономия 300₽"
 
         badge = f" {tariff['badge']}" if tariff['badge'] else ""
 
         text += f"{tariff['emoji']} {tariff['name']}{badge}\n"
-        text += f"   {tariff['price']}₽ • {tariff['traffic_gb']} ГБ{savings}\n\n"
+        text += f"   {tariff['price']}₽{savings}\n\n"
 
     text += """---
 
-Трафика хватит на:
+Безлимитный трафик на:
 • Стримы в HD/4K
 • Соцсети без ограничений
-• Торренты
-• Всё, что угодно
+• Любое использование
 
 Просто напиши номер тарифа (1, 2, 3 или 4)"""
 
@@ -108,11 +107,11 @@ def get_payment_text(tariff_key: str):
 
     savings = ""
     if tariff_key == "2":
-        savings = " → экономишь 50₽"
+        savings = " → экономишь 25₽"
     elif tariff_key == "3":
-        savings = " → экономишь 200₽"
+        savings = " → экономишь 100₽"
     elif tariff_key == "4":
-        savings = " → экономишь 600₽"
+        savings = " → экономишь 300₽"
 
     text = f"""{"Отлично!" if tariff_key == "1" else badge_text}
 {tariff['price']}₽ за {tariff['name']}{savings}

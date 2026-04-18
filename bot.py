@@ -62,7 +62,7 @@ async def cmd_start(message: Message):
     # Тарифы с кнопками
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(
-            text=f"{tariff['emoji']} {tariff['name']} — {tariff['price']}₽ ({tariff['traffic_gb']} ГБ) {tariff['badge']}",
+            text=f"{tariff['emoji']} {tariff['name']} — {tariff['price']}₽ {tariff['badge']}",
             callback_data=f"tariff_{key}"
         )]
         for key, tariff in TARIFFS.items()
@@ -70,10 +70,9 @@ async def cmd_start(message: Message):
 
     await message.answer(
         "💳 ВЫБЕРИ ПЕРИОД АРЕНДЫ:\n\n"
-        "Что входит в трафик:\n"
+        "Безлимитный трафик:\n"
         "• Стримы в HD/4K\n"
         "• Соцсети без ограничений\n"
-        "• Торренты и загрузки\n"
         "• Любое использование",
         reply_markup=keyboard
     )
@@ -98,13 +97,11 @@ async def process_tariff_button(callback: CallbackQuery):
         f"Отлично! Ты выбрал:\n\n"
         f"{tariff['emoji']} Аренда на {tariff['name']}\n"
         f"💰 Цена: {tariff['price']}₽\n"
-        f"📊 Трафик: {tariff['traffic_gb']} ГБ\n"
         f"⏱ Период: {tariff['name']}\n\n"
         f"Напиши @keml00 и скопируй это сообщение:\n\n"
         f"<code>Хочу арендовать сервер\n\n"
         f"Период: {tariff['name']}\n"
-        f"Цена: {tariff['price']}₽\n"
-        f"Трафик: {tariff['traffic_gb']} ГБ</code>",
+        f"Цена: {tariff['price']}₽</code>",
         reply_markup=keyboard,
         parse_mode=ParseMode.HTML
     )
@@ -168,7 +165,6 @@ async def cmd_status(message: Message):
     await message.answer(
         f"Твоя подписка:\n\n"
         f"Тариф: {subscription['tariff']}\n"
-        f"Трафик: {subscription['traffic_gb']} ГБ\n"
         f"Действует до: {subscription['end_date'][:10]}\n\n"
         f"Твой ключ:\n`{subscription['vpn_key']}`",
         parse_mode=ParseMode.MARKDOWN
