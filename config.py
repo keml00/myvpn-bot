@@ -20,7 +20,7 @@ SERVER_PORT = os.getenv("SERVER_PORT", "443")
 TARIFFS = {
     "1": {
         "name": "1 месяц",
-        "price": 225,
+        "price": 200,
         "traffic_gb": 100,
         "emoji": "1️⃣",
         "badge": ""
@@ -34,14 +34,14 @@ TARIFFS = {
     },
     "3": {
         "name": "6 месяцев",
-        "price": 950,
+        "price": 1000,
         "traffic_gb": 600,
         "emoji": "3️⃣",
         "badge": "💎 ВЫГОДНО"
     },
     "4": {
         "name": "12 месяцев",
-        "price": 1600,
+        "price": 1800,
         "traffic_gb": 1200,
         "emoji": "4️⃣",
         "badge": "⭐ ЛУЧШИЙ ВЫБОР"
@@ -71,11 +71,11 @@ def get_tariffs_text():
     for key, tariff in TARIFFS.items():
         savings = ""
         if key == "2":
-            savings = "\n   Экономия 125₽"
+            savings = "\n   Экономия 50₽"
         elif key == "3":
-            savings = "\n   Экономия 400₽"
+            savings = "\n   Экономия 200₽"
         elif key == "4":
-            savings = "\n   Экономия 1100₽"
+            savings = "\n   Экономия 600₽"
 
         badge = f" {tariff['badge']}" if tariff['badge'] else ""
 
@@ -107,11 +107,11 @@ def get_payment_text(tariff_key: str):
 
     savings = ""
     if tariff_key == "2":
-        savings = " → экономишь 125₽"
+        savings = " → экономишь 50₽"
     elif tariff_key == "3":
-        savings = " → экономишь 400₽"
+        savings = " → экономишь 200₽"
     elif tariff_key == "4":
-        savings = " → экономишь 1100₽"
+        savings = " → экономишь 600₽"
 
     text = f"""{"Отлично!" if tariff_key == "1" else badge_text}
 {tariff['price']}₽ за {tariff['name']}{savings}
