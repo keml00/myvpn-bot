@@ -12,6 +12,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.enums import ParseMode
+from aiohttp import web
 
 from database import Database
 from config import *
@@ -318,6 +319,26 @@ def generate_vpn_key() -> str:
     key_id = str(uuid.uuid4())
     return f"vless://{key_id}@{SERVER_HOST}:{SERVER_PORT}?encryption=none&security=tls&type=tcp"
 
+# ============= HTTP СЕРВЕР ДЛЯ RENDER =============
+
+async def health_check(request):
+    """Health check endpoint для Render"""
+    return web.Response(text="OK")
+
+async def start_web_server():
+    """Запуск веб-сервера для health checks"""
+    app = web.Application()
+    app.router.add_get('/health', health_check)
+    app.router.add_get('/', health_check)
+
+    runner = web.AppRunner(app)
+    await runner.setup()
+
+    port = int(os.getenv('PORT', 10000))
+    site = web.TCPSite(runner, '0.0.0.0', port)
+    await site.start()
+    logger.info(f"Веб-сервер запущен на порту {port}")
+
 # ============= ЗАПУСК БОТА =============
 
 async def main():
@@ -340,6 +361,9 @@ async def main():
 
     # Регистрация роутера
     dp.include_router(router)
+
+    # Запуск веб-сервера для Render
+    asyncio.create_task(start_web_server())
 
     # Уведомление админа о запуске
     try:
