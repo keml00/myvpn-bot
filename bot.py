@@ -88,15 +88,9 @@ async def process_tariff_button(callback: CallbackQuery):
 
     tariff = TARIFFS[tariff_key]
 
-    # Формируем текст для отправки в личку @keml00
-    message_text = f"Хочу арендовать сервер\n\nПериод: {tariff['name']}\nЦена: {tariff['price']}₽\nТрафик: {tariff['traffic_gb']} ГБ"
-
-    # Создаём ссылку на личку с предзаполненным текстом
-    deep_link = f"https://t.me/keml00?text={message_text.replace(' ', '%20').replace('\n', '%0A')}"
-
-    # Кнопка для перехода
+    # Кнопка для перехода в личку
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="💬 Написать @keml00", url=deep_link)]
+        [InlineKeyboardButton(text="💬 Написать @keml00", url="https://t.me/keml00")]
     ])
 
     await callback.message.edit_text(
@@ -105,8 +99,13 @@ async def process_tariff_button(callback: CallbackQuery):
         f"💰 Цена: {tariff['price']}₽\n"
         f"📊 Трафик: {tariff['traffic_gb']} ГБ\n"
         f"⏱ Период: {tariff['name']}\n\n"
-        f"Нажми кнопку ниже, чтобы написать @keml00 и оформить аренду 👇",
-        reply_markup=keyboard
+        f"Напиши @keml00 и скопируй это сообщение:\n\n"
+        f"<code>Хочу арендовать сервер\n\n"
+        f"Период: {tariff['name']}\n"
+        f"Цена: {tariff['price']}₽\n"
+        f"Трафик: {tariff['traffic_gb']} ГБ</code>",
+        reply_markup=keyboard,
+        parse_mode=ParseMode.HTML
     )
 
     await callback.answer()
