@@ -67,9 +67,6 @@ async def cmd_start(message: Message):
     await db.add_user(message.from_user.id, message.from_user.username, message.from_user.first_name)
     await db.update_last_active(message.from_user.id)
 
-    # Логируем действие
-    await log_user_action(message.from_user, "Запустил бота /start")
-
     # Проверяем активную подписку
     subscription = await db.get_user_subscription(message.from_user.id)
     if subscription:
@@ -113,9 +110,6 @@ async def process_tariff_button(callback: CallbackQuery):
         return
 
     tariff = TARIFFS[tariff_key]
-
-    # Логируем действие
-    await log_user_action(callback.from_user, f"Выбрал тариф: {tariff['name']} ({tariff['price']}₽)")
 
     # Формируем текст для автоматической вставки
     message_text = f"Привет! Хочу арендовать VPN сервер\n\nТариф: {tariff['name']}\nЦена: {tariff['price']}₽"
@@ -183,22 +177,27 @@ async def process_payment_no_photo(message: Message):
     """Если прислали не фото"""
     await message.answer("Пришли скриншот оплаты (фото) 📸")
 
-# Логирование всех текстовых сообщений
-@router.message()
-async def log_all_messages(message: Message):
-    """Логирование всех сообщений пользователей"""
-    if message.text:
-        await log_user_action(
-            message.from_user,
-            f"Написал сообщение: {message.text[:100]}"
-        )
-
 @router.message(Command("status"))
 async def cmd_status(message: Message):
-    """Проверка статуса подписки"""
-    # Логируем действие
-    await log_user_action(message.from_user, "Проверил статус подписки /status")
+    """Проверка статуса подписки или активности пользователей (для админа)"""
+    # Если админ - показываем активность пользователей
+    if message.from_user.id == ADMIN_ID:
+        users = await db.get_recent_users(limit=10)
+        if not users:
+            await message.answer("Нет активных пользователей")
+            return
 
+        text = "📊 Последние 10 активных пользователей:\n\n"
+        for user in users:
+            username = f"@{user['username']}" if user['username'] else "нет username"
+            text += f"• {user['first_name']} ({username})\n"
+            text += f"  ID: {user['user_id']}\n"
+            text += f"  Последняя активность: {user['last_active'][:16]}\n\n"
+
+        await message.answer(text)
+        return
+
+    # Для обычных пользователей - показываем их подписку
     subscription = await db.get_user_subscription(message.from_user.id)
 
     if not subscription:

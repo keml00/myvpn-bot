@@ -239,3 +239,23 @@ class Database:
                 "total_revenue": total_revenue,
                 "today_revenue": today_revenue
             }
+
+    async def get_recent_users(self, limit: int = 10) -> List[Dict]:
+        """Получить последних активных пользователей"""
+        async with aiosqlite.connect(self.db_path) as db:
+            async with db.execute("""
+                SELECT user_id, username, first_name, last_active
+                FROM users
+                ORDER BY last_active DESC
+                LIMIT ?
+            """, (limit,)) as cursor:
+                rows = await cursor.fetchall()
+                return [
+                    {
+                        "user_id": row[0],
+                        "username": row[1],
+                        "first_name": row[2],
+                        "last_active": row[3]
+                    }
+                    for row in rows
+                ]
