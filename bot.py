@@ -2,6 +2,7 @@ import asyncio
 import logging
 import sys
 import os
+from urllib.parse import quote
 
 # Добавляем текущую директорию в путь
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -88,9 +89,13 @@ async def process_tariff_button(callback: CallbackQuery):
 
     tariff = TARIFFS[tariff_key]
 
-    # Кнопка для перехода в личку
+    # Формируем текст для автоматической вставки
+    message_text = f"Привет! Хочу арендовать VPN сервер\n\nТариф: {tariff['name']}\nЦена: {tariff['price']}₽"
+    encoded_text = quote(message_text)
+
+    # Кнопка с deep link для автоматической вставки текста
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="💬 Написать @keml00", url="https://t.me/keml00")]
+        [InlineKeyboardButton(text="💬 Написать @keml00", url=f"https://t.me/keml00?text={encoded_text}")]
     ])
 
     await callback.message.edit_text(
@@ -98,10 +103,7 @@ async def process_tariff_button(callback: CallbackQuery):
         f"{tariff['emoji']} Аренда на {tariff['name']}\n"
         f"💰 Цена: {tariff['price']}₽\n"
         f"⏱ Период: {tariff['name']}\n\n"
-        f"Напиши @keml00 и скопируй это сообщение:\n\n"
-        f"<code>Привет! Хочу арендовать VPN сервер\n\n"
-        f"Тариф: {tariff['name']}\n"
-        f"Цена: {tariff['price']}₽</code>",
+        f"Нажми кнопку ниже — текст вставится автоматически:",
         reply_markup=keyboard,
         parse_mode=ParseMode.HTML
     )
