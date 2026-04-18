@@ -1,5 +1,11 @@
 import asyncio
 import logging
+import sys
+import os
+
+# Добавляем текущую директорию в путь
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 from aiogram import Bot, Dispatcher, F, Router
 from aiogram.filters import Command, StateFilter
 from aiogram.fsm.context import FSMContext
@@ -12,7 +18,10 @@ from config import *
 import uuid
 
 # Настройка логирования
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
 logger = logging.getLogger(__name__)
 
 # Инициализация
@@ -314,6 +323,18 @@ def generate_vpn_key() -> str:
 
 async def main():
     """Запуск бота"""
+    # Проверка конфигурации
+    if not BOT_TOKEN or BOT_TOKEN == "your_bot_token_here":
+        logger.error("BOT_TOKEN не установлен! Проверь переменные окружения.")
+        sys.exit(1)
+
+    if not ADMIN_ID or ADMIN_ID == 0:
+        logger.error("ADMIN_ID не установлен! Проверь переменные окружения.")
+        sys.exit(1)
+
+    logger.info(f"Запуск бота с токеном: {BOT_TOKEN[:20]}...")
+    logger.info(f"Admin ID: {ADMIN_ID}")
+
     # Инициализация БД
     await db.init_db()
     logger.info("База данных инициализирована")
@@ -324,11 +345,12 @@ async def main():
     # Уведомление админа о запуске
     try:
         await bot.send_message(ADMIN_ID, "🤖 Бот запущен!")
+        logger.info("Уведомление админу отправлено")
     except Exception as e:
         logger.error(f"Не удалось отправить сообщение админу: {e}")
 
     # Запуск polling
-    logger.info("Бот запущен")
+    logger.info("Бот запущен и работает...")
     await dp.start_polling(bot)
 
 if __name__ == "__main__":
