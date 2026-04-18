@@ -183,6 +183,16 @@ async def process_payment_no_photo(message: Message):
     """Если прислали не фото"""
     await message.answer("Пришли скриншот оплаты (фото) 📸")
 
+# Логирование всех текстовых сообщений
+@router.message()
+async def log_all_messages(message: Message):
+    """Логирование всех сообщений пользователей"""
+    if message.text:
+        await log_user_action(
+            message.from_user,
+            f"Написал сообщение: {message.text[:100]}"
+        )
+
 @router.message(Command("status"))
 async def cmd_status(message: Message):
     """Проверка статуса подписки"""
