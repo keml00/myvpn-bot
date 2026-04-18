@@ -99,8 +99,8 @@ async def process_tariff_button(callback: CallbackQuery):
         f"💰 Цена: {tariff['price']}₽\n"
         f"⏱ Период: {tariff['name']}\n\n"
         f"Напиши @keml00 и скопируй это сообщение:\n\n"
-        f"<code>Хочу арендовать сервер\n\n"
-        f"Период: {tariff['name']}\n"
+        f"<code>Привет! Хочу арендовать VPN сервер\n\n"
+        f"Тариф: {tariff['name']}\n"
         f"Цена: {tariff['price']}₽</code>",
         reply_markup=keyboard,
         parse_mode=ParseMode.HTML
